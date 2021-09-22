@@ -45,7 +45,7 @@ class Genre(models.Model):
         verbose_name_plural = "Genres"
 
 
-class Movies(models.Model):
+class Movie(models.Model):
     """Movies"""
     title = models.CharField("Name", max_length=100)
     tagline = models.CharField("Tags", max_length=100, default="")
@@ -59,8 +59,8 @@ class Movies(models.Model):
     world_premiere = models.DateField("Premiere", default=date.today)
     budget = models.PositiveSmallIntegerField("Budget", default=0, help_text="Add value in dollars")
     fees_in_usa = models.PositiveSmallIntegerField("Box office in USA", default=0, help_text="Add value in dollars")
-    fees_in_usa = models.PositiveSmallIntegerField("Box office in the world",
-                                                   default=0, help_text="Add value in dollars")
+    fees_in_world = models.PositiveSmallIntegerField("Box office in the world",
+                                                     default=0, help_text="Add value in dollars")
     category = models.ForeignKey(Category, verbose_name="Category", on_delete=models.SET_NULL, null=True)
     url = models.SlugField(max_length=160, unique=True)
     draft = models.BooleanField("Draft", default=False)
@@ -71,3 +71,60 @@ class Movies(models.Model):
     class Meta:
         verbose_name = "Movie"
         verbose_name_plural = "Movies"
+
+
+class MovieShots(models.Model):
+    """Shots from movie"""
+    title = models.CharField("Name", max_length=100)
+    description = models.TextField("Description")
+    image = models.ImageField("Image", upload_to="movie_shots/")
+    movie = models.ForeignKey(Movie, verbose_name="Movie", on_delete=models.CASCADE)
+
+    def __str__(self):
+        return self.title
+
+    class Meta:
+        verbose_name = "Shot from movie"
+        verbose_name_plural = "Shots from movie"
+
+
+class RatingStar(models.Model):
+    """Movie star"""
+    value = models.SmallIntegerField("Value", default=0)
+
+    def __str__(self):
+        return self.value
+
+    class Meta:
+        verbose_name = "Movie star"
+        verbose_name_plural = "Movie stars"
+
+
+class Rating(models.Model):
+    """Rating"""
+    ip = models.CharField("IP address", max_length=15)
+    star = models.ForeignKey(RatingStar, on_delete=models.CASCADE, verbose_name="star")
+    movie = models.ForeignKey(Movie, on_delete=models.CharField, verbose_name="movie")
+
+    def __str__(self):
+        return f"{self.star} - {self.movie}"
+
+    class Meta:
+        verbose_name = "Rating"
+        verbose_name_plural = "Ratings"
+
+
+class Reviews(models.Model):
+    """Reviews"""
+    email = models.EmailField()
+    name = models.CharField("Name", max_length=100)
+    text = models.TextField("message", max_length=5000)
+    parent = models.ForeignKey("self", verbose_name="Parent", on_delete=models.SET_NULL, blank=True, null=True)
+    movie = models.ForeignKey(Movie, verbose_name="Movie", on_delete=models.CASCADE)
+
+    def __str__(self):
+        return f"{self.name} - {self.movie}"
+
+    class Meta:
+        verbose_name = "Review"
+        verbose_name_plural = "Reviews"
