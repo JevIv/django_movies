@@ -21,6 +21,7 @@ class Actor(models.Model):
     """Actors and directors"""
     name = models.CharField("Name", max_length=100)
     age = models.PositiveSmallIntegerField("Age", default=0)
+    description = models.TextField("Description")
     image = models.ImageField("Image", upload_to="actors/")
 
     def __str__(self):
@@ -104,7 +105,7 @@ class Rating(models.Model):
     """Rating"""
     ip = models.CharField("IP address", max_length=15)
     star = models.ForeignKey(RatingStar, on_delete=models.CASCADE, verbose_name="star")
-    movie = models.ForeignKey(Movie, on_delete=models.CharField, verbose_name="movie")
+    movie = models.ForeignKey(Movie, on_delete=models.CASCADE, verbose_name="movie")
 
     def __str__(self):
         return f"{self.star} - {self.movie}"
